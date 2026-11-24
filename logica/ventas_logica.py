@@ -110,3 +110,24 @@ def listar_ventas_recientes(limite: int = 50):
     )
     db.close()
     return ventas
+
+def obtener_detalle_venta(venta_id: int):
+    """Devuelve los productos vendidos en una venta (nombre, cantidad, precio y subtotal)."""
+    db = SessionLocal()
+    detalles = (
+        db.query(DetalleVenta)
+        .options(joinedload(DetalleVenta.producto))
+        .filter(DetalleVenta.venta_id == venta_id)
+        .all()
+    )
+    resultado = [
+        {
+            "nombre": d.producto.nombre if d.producto else "(producto eliminado)",
+            "cantidad": d.cantidad,
+            "precio_unitario": d.precio_unitario,
+            "subtotal": d.cantidad * d.precio_unitario,
+        }
+        for d in detalles
+    ]
+    db.close()
+    return resultado

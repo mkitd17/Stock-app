@@ -63,15 +63,14 @@ class MainWindow(QMainWindow):
         self.pagina_historial = VentasHistorialPage()
 
         for pagina in (self.pagina_productos, self.pagina_ventas, self.pagina_reportes, self.pagina_usuarios, self.pagina_historial):
-            pagina.setStyleSheet("font-size: 18px; padding: 20px;")
             self.contenido.addWidget(pagina)
 
         # Conectar botones con el cambio de página
-        self.btn_productos.clicked.connect(lambda: self.contenido.setCurrentWidget(self.pagina_productos))
-        self.btn_ventas.clicked.connect(lambda: self.contenido.setCurrentWidget(self.pagina_ventas))
+        self.btn_productos.clicked.connect(self.ir_a_productos)
+        self.btn_ventas.clicked.connect(self.ir_a_ventas)
         self.btn_reportes.clicked.connect(self.ir_a_reportes)
         self.btn_usuarios.clicked.connect(lambda: self.contenido.setCurrentWidget(self.pagina_usuarios))
-        self.btn_historial.clicked.connect(lambda: self.contenido.setCurrentWidget(self.pagina_historial))
+        self.btn_historial.clicked.connect(self.ir_a_historial)
 
         # Armar el layout final
         layout_principal.addWidget(menu_lateral)
@@ -108,3 +107,21 @@ class MainWindow(QMainWindow):
         """Se ejecuta automáticamente cuando el usuario cierra la ventana."""
         crear_backup()
         event.accept()
+    def ir_a_productos(self):
+        self.contenido.setCurrentWidget(self.pagina_productos)
+        self.pagina_productos.actualizar_tabla()
+
+    def ir_a_historial(self):
+        self.contenido.setCurrentWidget(self.pagina_historial)
+        self.pagina_historial.actualizar_tabla()
+    def ir_a_productos(self):
+        self.contenido.setCurrentWidget(self.pagina_productos)
+        self.pagina_productos.actualizar_tabla()
+
+    def ir_a_ventas(self):
+        self.contenido.setCurrentWidget(self.pagina_ventas)
+        self.pagina_ventas.actualizar_resultados()
+
+    def ir_a_historial(self):
+        self.contenido.setCurrentWidget(self.pagina_historial)
+        self.pagina_historial.actualizar_tabla()

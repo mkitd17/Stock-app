@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from logica.ventas_logica import buscar_producto_por_texto, confirmar_venta
-from logica.productos_logica import buscar_por_codigo_exacto
+from logica.productos_logica import buscar_por_codigo_exacto, listar_productos
 from logica.ticket_logica import generar_ticket_pdf
 
 
@@ -23,7 +23,7 @@ class VentasPage(QWidget):
         self.input_busqueda.setPlaceholderText("Buscar producto por nombre o código de barras...")
         self.input_busqueda.textChanged.connect(self.actualizar_resultados)
         layout.addWidget(self.input_busqueda)
-       
+
         # --- Campo de escaneo rápido ---
         self.input_scanner = QLineEdit()
         self.input_scanner.setPlaceholderText("📷 Escanear código de barras aquí...")
@@ -33,7 +33,7 @@ class VentasPage(QWidget):
 
         # --- Lista de resultados de búsqueda ---
         self.lista_resultados = QListWidget()
-        self.lista_resultados.setMaximumHeight(120)
+        self.lista_resultados.setMinimumHeight(200)
         self.lista_resultados.itemDoubleClicked.connect(self.agregar_al_carrito)
         layout.addWidget(self.lista_resultados)
 
@@ -78,18 +78,20 @@ class VentasPage(QWidget):
         barra_total.addWidget(self.btn_confirmar)
         layout.addLayout(barra_total)
 
+        # --- Final del __init__: cargar la lista de productos y enfocar el escáner ---
         self.resultados_actuales = []
+        self.actualizar_resultados()
         self.input_scanner.setFocus()
 
     def actualizar_resultados(self):
         texto = self.input_busqueda.text().strip()
         self.lista_resultados.clear()
-        self.resultados_actuales = []
 
-        if not texto:
-            return
+        if texto:
+            self.resultados_actuales = buscar_producto_por_texto(texto)
+        else:
+            self.resultados_actuales = listar_productos("")
 
-        self.resultados_actuales = buscar_producto_por_texto(texto)
         for producto in self.resultados_actuales:
             item = QListWidgetItem(f"{producto.nombre} — ${producto.precio_venta:.2f} (stock: {producto.stock_actual})")
             self.lista_resultados.addItem(item)
@@ -127,7 +129,8 @@ class VentasPage(QWidget):
         self.actualizar_tabla_carrito()
 
         self.input_busqueda.clear()
-        self.lista_resultados.clear()
+        self.actualizar_resultados()
+
     def procesar_escaneo(self):
         codigo = self.input_scanner.text().strip()
         self.input_scanner.clear()
@@ -232,6 +235,6 @@ class VentasPage(QWidget):
                 os.startfile(ruta_pdf)
 
             self.vaciar_carrito()
+            self.actualizar_resultados()
         except ValueError as e:
             QMessageBox.warning(self, "Error", str(e))
-    

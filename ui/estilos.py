@@ -46,13 +46,12 @@ QPushButton:pressed {
 }
 
 /* --- Campos de texto --- */
-QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+QLineEdit, QComboBox {
     background-color: #FFFFFF;
     border: 1px solid #E0DCD3;
     border-radius: 6px;
     padding: 6px 8px;
 }
-
 QLineEdit:focus, QComboBox:focus {
     border: 1px solid #D85A30;
 }
